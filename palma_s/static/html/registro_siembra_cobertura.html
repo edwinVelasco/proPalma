@@ -1,0 +1,216 @@
+<div class="register-box">
+
+      <div class="register-box-body">
+        <p class="login-box-msg">Registro de Siembra de Cobertura</p>
+
+        <form action="add_siembra_cobertura" id="add_siembra_cobertura" method="post">
+            <div id="tok">
+
+            </div>
+            <fieldset>
+
+                <div class="row form-group">
+                    <div class="col-xs-6">
+                        <select id="unidad" name="unidad" class="form-control" >
+
+                        </select>
+                    </div>
+                    <div class="col-xs-6">
+                        <input class="form-control" id="area" name="area" placeholder="Area" type="number" required title="Area de Aplicacion de la Enmienda" disabled />
+                    </div>
+                </div>
+
+                <div class="row form-group">
+                    <div class="col-xs-6">
+                        <select id="insumo" name="insumo" class="form-control" title="Insumo">
+
+                        </select>
+                    </div>
+                    <div class="col-xs-6">
+                        <input class="form-control" id="cantidad" name="cantidad" placeholder="Cantidad" type="number" required title="Cantidad" value="1" onkeyup="campos_completar()"/>
+                    </div>
+                </div>
+
+                <div class="row form-group">
+                    <div class="col-xs-6">
+                        <input class="form-control" id="precio_unidad" name="precio_unidad" placeholder="Precio por Unidad" type="number" required title="Precio por Unidad"  onkeyup="campos_completar()" value="1"/>
+                    </div>
+                    <div class="col-xs-6">
+                        <input class="form-control" id="subtotal" name="subtotal" placeholder="SubTotal" type="number" required title="SubTotal" disabled/>
+                    </div>
+                </div>
+
+                <div class="row form-group">
+
+                    <div class="col-xs-6">
+                        <input class="form-control" id="fecha" name="fecha" placeholder="Fecha" type="text" required title="Fecha de Aplicación de la Enmienda"/>
+                    </div>
+                    <div class="col-xs-6">
+                    </div>
+                </div>
+
+
+
+          <div class="row">
+            <div class="col-xs-8">
+
+            </div>
+            <div class="col-xs-4">
+              <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+          </div>
+
+                </fieldset>
+        </form>
+
+      </div>
+    </div>
+<script>
+
+    jQuery(document).ready(function(){
+        $('#tok').html(token);
+        frm = $('#add_siembra_cobertura');
+        $("#fecha").datepicker().datepicker("setDate", new Date());
+        get_area_zona();
+
+        get_insumos_siembra_cobertura();
+        get_unidades_siembra_cobertura();
+      });
+
+    function get_area_zona(){
+        $.ajax({
+            type: "GET",
+            url: "get_area_zona",
+            data: '',
+            success: function (data) {
+                $('#area').val(data)
+            },
+            error: function(data) {
+                console.log(data)
+            }
+        });
+        return false;
+    }
+
+    function get_unidades_siembra_cobertura(){
+        $.ajax({
+            type: "GET",
+            url: "get_unidades",
+            data: {'tipo':'p'},
+            success: function (data) {
+                if (data.length == 0)
+                {
+                    UIkit.notify({
+                        message : 'No hay Unidades Registradas',
+                        status  : 'warning',
+                        timeout : 4000,
+                        pos:'top-center'
+                    });
+                }
+                else{
+                    option = '<option value="0">Unidades</option>';
+                    $('#unidad').append(option);
+                    for (i=0; i< data.length; i++)
+                    {
+                        option = '<option value="'+data[i].pk+'">'+data[i].fields.unidad+'</option>';
+                        $('#unidad').append(option);
+                    }
+                }
+
+            },
+            error: function(data) {
+                console.log(data)
+            }
+        });
+        return false;
+    }
+
+    function get_insumos_siembra_cobertura(){
+        $.ajax({
+            type: "GET",
+            url: "get_insumos_form",
+            data: {'tipo':'0'},
+            success: function (data) {
+                if (data.length == 0)
+                {
+                    UIkit.notify({
+                        message : 'No hay Insumos Registrados',
+                        status  : 'warning',
+                        timeout : 4000,
+                        pos:'top-center'
+                    });
+                }
+                else{
+                    option = '<option value="0">Insumos</option>';
+                    $('#insumo').append(option);
+                    for (i=0; i< data.length; i++)
+                    {
+                        option = '<option value="'+data[i].pk+'">'+data[i].fields.insumo+'</option>';
+                        $('#insumo').append(option);
+                    }
+                }
+
+            },
+            error: function(data) {
+                console.log(data)
+            }
+        });
+        return false;
+    }
+
+    function campos_completar(){
+        a = $('#area').val();
+        c = $('#cantidad').val();
+        p = $('#precio_unidad').val();
+        if (a == '' || c == '' || p == ''){
+
+        }
+        else{
+            area = a*1;
+            cantidad = c*1;
+            precio_en = p*1;
+            subt = area*cantidad*precio_en;
+            $('#subtotal').val(subt);
+
+        }
+    }
+
+    frm.submit(function () {
+        $('#subtotal').removeAttr('disabled');
+        $('#area').removeAttr('disabled');
+        $.ajax({
+            type: frm.attr('method'),
+            url: frm.attr('action'),
+            data: frm.serialize(),
+            success: function (data) {
+                $('#subtotal').attr('disabled','disabled');
+                $('#area').attr('disabled','disabled');
+                if (data === 'error')
+                    {
+                        UIkit.notify({
+                            message : 'Upps! algo salio mal, revisa los datos XD',
+                            status  : 'danger',
+                            timeout : 3000,
+                            pos:'top-center'
+                        });
+                    }
+                else
+                    {
+                        UIkit.notify({
+                            message : 'Siembra de Cobertura Registrada Con Exito',
+                            status  : 'success',
+                            timeout : 3000,
+                            pos:'top-center'
+                        });
+                        get_siembra_cobertura();
+                    }
+            },
+            error: function(data) {
+                alert(data);
+                console.log(data)
+            }
+        });
+        return false;
+    });
+
+</script>

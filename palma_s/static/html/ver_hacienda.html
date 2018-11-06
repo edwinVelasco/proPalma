@@ -1,0 +1,209 @@
+<div class="register-box">
+
+      <div class="register-box-body">
+        <p class="login-box-msg">Ver Información de Hacienda</p>
+
+        <form action="editar_hacienda" id="new_hacienda" method="post">
+            <div id="tok">
+
+            </div>
+            <fieldset>
+
+
+            <div class="form-group has-feedback">
+                <input class="form-control" id="nombre" name="nombre" placeholder="Nombre" type="text" required title="Nombre" disabled/>
+            </div>
+            <div class="form-group has-feedback">
+                <input class="form-control" id="cedula" name="cedula" placeholder="Cedula Catastral" type="text" required disabled/>
+            </div>
+
+
+            <div class="form-group has-feedback">
+                <input class="form-control" name="direccion" placeholder="Dirección" type="text" id="direccion" required title="Dirección" disabled/>
+            </div>
+                <div class="form-group has-feedback">
+                    <input class="form-control" name="telefono" id="telefono" placeholder="Telefono-Celular" type="text" required title="Telefono" disabled/>
+            </div>
+
+                <div class="row form-group">
+
+                    <div class="col-xs-6">
+                        <select id="departamento" name="departamento" class="form-control" onchange="get_municipios()" title="Departamentos" disabled>
+
+                        </select>
+                    </div>
+                    <div class="col-xs-6">
+                        <select id="municipio" name="municipio" class="form-control" title="Municipios" disabled>
+
+                        </select>
+                    </div>
+                </div>
+                <div class="row form-group">
+
+                    <div class="col-xs-6">
+                        <input class="form-control" name="nucleo" placeholder="Nucleo Palmero" type="text" id="nucleo" required title="Nucleo Palmero" disabled/>
+                    </div>
+                    <div class="col-xs-6">
+                        <input class="form-control" name="area" placeholder="Area en Hectareas" type="number" id="area" required title="Area en Hectareas" disabled/>
+                    </div>
+                </div>
+
+                <div class="form-group has-feedback">
+                    <textarea class="form-control" name="descripcion" placeholder="Descripción"  id="descripcion" required title="Descripción" disabled></textarea>
+                </div>
+
+          <div class="row">
+            <div class="col-xs-8">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" id="activo" name="activo" disabled> Habilitado
+                    </label>
+                </div>
+            </div>
+            <div class="col-xs-4">
+
+            </div>
+          </div>
+
+                </fieldset>
+        </form>
+          <div class="row">
+            <div class="col-xs-3">
+              <div class="checkbox icheck">
+                <label>
+                  <!-- <input type="checkbox"> I agree to the <a href="#">terms</a>-->
+                </label>
+              </div>
+
+            </div><!-- /.col -->
+            <div class="col-xs-9">
+              <button type="submit" class="btn btn-primary" onclick="haciendas()">Salir</button>
+            </div><!-- /.col -->
+          </div>
+
+      </div>
+    </div>
+<script>
+
+    var mm = 1;
+    var muni;
+    jQuery(document).ready(function(){
+        get_departamentos();
+      });
+
+    function get_hacienda(){
+        $.ajax({
+            type: "GET",
+            url: "get_hacienda",
+            data: {'id':hacienda_editar},
+            success: function (data) {
+                datos = data.split(',');
+                /*
+                    datos[0] = nombre
+                     datos[1] = municipio
+                     datos[2] = direccion
+                     datos[3] = nucleo palmero
+                     datos[4] = area_total
+                     datos[5] = descripcion
+                     datos[6] = activo
+                     datos[7] = cedula catastral
+                     datos[8] = telefono
+
+
+                 */
+
+                $('#nombre').val(datos[0]);
+                $('#direccion').val(datos[2]);
+                $('#nucleo').val(datos[3]);
+                $('#descripcion').val(datos[5]);
+                $('#area').val(datos[4]);
+                $('#cedula').val(datos[7]);
+                $('#telefono').val(datos[8]);
+
+
+
+                if (datos[6] == 1 || datos[6] == '1')
+                    $('#activo').attr('checked', true);
+
+                split_municipio = datos[1].split('+');
+
+                /*
+                    split_municipio[0] == id munucipio
+                    split_municipio[1] == id departamento
+                 */
+                muni = split_municipio[0];
+                $('#departamento').val(split_municipio[1]);
+                get_municipios();
+            },
+            error: function(data) {
+                console.log(data)
+            }
+        });
+        return false;
+    }
+
+    function get_departamentos(){
+        $.ajax({
+            type: "GET",
+            url: "get_departamentos",
+            data: "",
+            success: function (data) {
+                console.log(data);
+                option = '<option value="0">Departamento</option>';
+                $('#departamento').append(option);
+
+                for(i=0; i< data.length; i++)
+                {
+                    option = '<option value="'+data[i].pk+'">'+data[i].fields.nombre+'</option>';
+                    $('#departamento').append(option);
+                }
+                get_hacienda();
+
+            },
+            error: function(data) {
+                console.log(data)
+            }
+        });
+        return false;
+    }
+
+    function get_municipios(){
+        dep = $('#departamento').val()
+        if(dep=='o' || dep==0)
+        {
+            $('#municipio').html("");
+            return;
+        }
+        $.ajax({
+            type: "GET",
+            url: "get_municipios",
+            data: {"departamento":dep},
+            success: function (data) {
+                console.log(data)
+                $('#municipio').html("");
+                option = '<option value="0">Municipio</option>';
+                $('#municipio').append(option);
+
+                for(i=0; i< data.length; i++)
+                {
+                    option = '<option value="'+data[i].pk+'">'+data[i].fields.nombre+'</option>'
+                    $('#municipio').append(option)
+                }
+
+                if(mm == 1)
+                {
+                    $('#municipio').val(muni);
+                    mm = 0;
+                }
+
+            },
+            error: function(data) {
+                console.log(data)
+            }
+        });
+        return false;
+    }
+
+
+
+</script>

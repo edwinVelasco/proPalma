@@ -1,0 +1,225 @@
+<div class="register-box">
+
+      <div class="register-box-body">
+        <p class="login-box-msg">Edición de Labores de Siembra</p>
+
+        <form action="editar_labor_siembra" id="editar_labor_siembra" method="post">
+            <div id="tok">
+
+            </div>
+            <fieldset>
+
+                <div class="row form-group">
+                    <div class="col-xs-6">
+                        <select id="unidad" name="unidad" class="form-control" title="Tipo de Unidad">
+                        </select>
+                    </div>
+                    <div class="col-xs-6">
+                        <input class="form-control" id="area" name="area" placeholder="Area" type="number" required title="Area de Aplicacion de la Enmienda" disabled />
+                    </div>
+                </div>
+
+                <div class="row form-group">
+                    <div class="col-xs-6">
+                        <select id="labor" name="labor" class="form-control" title="Otros Labores">
+
+                        </select>
+                    </div>
+                    <div class="col-xs-6">
+                        <input class="form-control" id="cantidad" name="cantidad" placeholder="Cantidad" type="number" required title="Cantidad" value="1" onkeyup="campos_completar()"/>
+                    </div>
+                </div>
+
+                <div class="row form-group">
+                    <div class="col-xs-6">
+                        <input class="form-control" id="precio_unidad" name="precio_unidad" placeholder="Precio por Unidad" type="number" required title="Precio por Unidad"  onkeyup="campos_completar()" value="1"/>
+                    </div>
+                    <div class="col-xs-6">
+                        <input class="form-control" id="subtotal" name="subtotal" placeholder="SubTotal" type="number" required title="SubTotal" disabled/>
+                    </div>
+                </div>
+
+                <div class="row form-group">
+
+                    <div class="col-xs-6">
+                        <input class="form-control" id="fecha" name="fecha" placeholder="Fecha" type="text" required title="Fecha de Aplicación de la Enmienda"/>
+                    </div>
+                    <div class="col-xs-6">
+                    </div>
+                </div>
+
+
+
+          <div class="row">
+            <div class="col-xs-6">
+
+            </div>
+            <div class="col-xs-6">
+              <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+          </div>
+
+                </fieldset>
+        </form>
+
+      </div>
+    </div>
+<script>
+    jQuery(document).ready(function(){
+        etiqueta_id = '<input name="id" value="'+hacienda_editar+'" type="hidden">';
+        $('#tok').html(token+etiqueta_id);
+        frm = $('#editar_labor_siembra');
+        $("#fecha").datepicker();
+        get_labor_siembra_palma_registro();
+        get_unidades_siembra_palma_registro();
+      });
+
+    function get_labor_siembra_editar(){
+        $.ajax({
+            type: "GET",
+            url: "get_labor_siembra_editar",
+            data: {'id':hacienda_editar},
+            success: function (data) {
+                datos = data.split(',');
+
+                $('#unidad').val(datos[0]);
+                $('#area').val(datos[1]);
+                $('#labor').val(datos[2]);
+                $('#cantidad').val(datos[3]);
+                $('#precio_unidad').val(datos[4]);
+                $('#subtotal').val(datos[5]);
+                $('#fecha').val(datos[6]);
+
+            },
+            error: function(data) {
+                console.log(data)
+            }
+        });
+        return false;
+    }
+
+
+    function get_unidades_siembra_palma_registro(){
+        $.ajax({
+            type: "GET",
+            url: "get_unidades",
+            data: {'tipo':'u'},
+            success: function (data) {
+                if (data.length == 0)
+                {
+                    UIkit.notify({
+                        message : 'No hay Unidades Registradas',
+                        status  : 'warning',
+                        timeout : 4000,
+                        pos:'top-center'
+                    });
+                }
+                else{
+                    option = '<option value="0">Unidades</option>';
+                    $('#unidad').append(option);
+                    for (i=0; i< data.length; i++)
+                    {
+                        option = '<option value="'+data[i].pk+'">'+data[i].fields.unidad+'</option>';
+                        $('#unidad').append(option);
+                    }
+                }
+
+                get_labor_siembra_editar();
+
+            },
+            error: function(data) {
+                console.log(data)
+            }
+        });
+        return false;
+    }
+
+    function get_labor_siembra_palma_registro(){
+        $.ajax({
+            type: "GET",
+            url: "get_labor_form",
+            data:{'tipo':'2'},
+            success: function (data) {
+                if (data.length == 0)
+                {
+                    UIkit.notify({
+                        message : 'No hay Labores para la Siembra Registrados',
+                        status  : 'warning',
+                        timeout : 4000,
+                        pos:'top-center'
+                    });
+                }
+                else{
+                    option = '<option value="0">Labores Siembra</option>';
+                    $('#labor').append(option);
+                    for (i=0; i< data.length; i++)
+                    {
+                        option = '<option value="'+data[i].pk+'">'+data[i].fields.labor+'</option>';
+                        $('#labor').append(option);
+                    }
+                }
+
+            },
+            error: function(data) {
+                console.log(data)
+            }
+        });
+        return false;
+    }
+
+    function campos_completar(){
+        a = $('#area').val();
+        c = $('#cantidad').val();
+        p = $('#precio_unidad').val();
+        if (a == '' || c == '' || p == ''){
+
+        }
+        else{
+            area = a*1;
+            cantidad = c*1;
+            precio_en = p*1;
+            subt = area*cantidad*precio_en;
+            $('#subtotal').val(subt);
+
+        }
+    }
+
+    frm.submit(function () {
+        $('#subtotal').removeAttr('disabled');
+        $('#area').removeAttr('disabled');
+        $.ajax({
+            type: frm.attr('method'),
+            url: frm.attr('action'),
+            data: frm.serialize(),
+            success: function (data) {
+                $('#subtotal').attr('disabled','disabled');
+                $('#area').attr('disabled','disabled');
+                if (data === 'error')
+                    {
+                        UIkit.notify({
+                            message : 'Upps! algo salio mal, revisa los datos XD',
+                            status  : 'danger',
+                            timeout : 3000,
+                            pos:'top-center'
+                        });
+                    }
+                else
+                    {
+                        UIkit.notify({
+                            message : 'Siembra de Palma Registrada Con Exito',
+                            status  : 'success',
+                            timeout : 3000,
+                            pos:'top-center'
+                        });
+                        get_labores_siembra();
+                    }
+            },
+            error: function(data) {
+                alert(data);
+                console.log(data)
+            }
+        });
+        return false;
+    });
+
+</script>

@@ -1,0 +1,101 @@
+<div class="register-box">
+
+      <div class="register-box-body">
+        <p class="login-box-msg">Edición de Enmienda</p>
+
+        <form action="editar_enmienda" id="editar_enmienda" method="post">
+            <div id="tok">
+
+            </div>
+            <fieldset>
+
+
+            <div class="form-group has-feedback">
+                <input class="form-control" id="nombre" name="nombre" title="Nombre de la Enmienda" type="text" required/>
+            </div>
+
+          <div class="row">
+            <div class="col-xs-8">
+
+            </div>
+            <div class="col-xs-4">
+              <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+          </div>
+
+                </fieldset>
+        </form>
+
+      </div>
+    </div>
+<script>
+    var frm;
+    jQuery(document).ready(function(){
+        etiqueta_id = '<input name="id" value="'+hacienda_editar+'" type="hidden">';
+        $('#tok').html(token+etiqueta_id);
+        frm = $('#editar_enmienda');
+        get_enmienda_editar();
+      });
+
+    function get_enmienda_editar(){
+        $.ajax({
+            type: 'GET',
+            url: 'get_enmienda',
+            data: {'id' : hacienda_editar},
+            success: function (data) {
+
+                $('#nombre').val(data);
+            },
+            error: function(data) {
+                alert(data);
+                console.log(data)
+            }
+        });
+        return false;
+    }
+
+    frm.submit(function () {
+        $.ajax({
+            type: frm.attr('method'),
+            url: frm.attr('action'),
+            data: frm.serialize(),
+            success: function (data) {
+                if (data === 'ok')
+                    {
+                        UIkit.notify({
+                            message : 'Enmienda, Editada con Exitoso',
+                            status  : 'success',
+                            timeout : 3000,
+                            pos:'top-center'
+                        });
+                        get_enmiendas();
+                    }
+                else if (data === 'ya')
+                    {
+                        UIkit.notify({
+                            message : 'Ya Hay Una Enmienda Registrada Con Este Nombre',
+                            status  : 'success',
+                            timeout : 3000,
+                            pos:'top-center'
+                        });
+                    }
+                else
+                    {
+                        UIkit.notify({
+                            message : 'Upps! algo salio mal Enmienda' ,
+                            status  : 'danger',
+                            timeout : 3000,
+                            pos:'top-center'
+                        });
+                    }
+            },
+            error: function(data) {
+                alert(data);
+                console.log(data)
+            }
+        });
+        return false;
+    });
+
+
+</script>

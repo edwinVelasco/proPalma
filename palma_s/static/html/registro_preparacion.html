@@ -1,0 +1,204 @@
+<div class="register-box">
+
+      <div class="register-box-body">
+        <p class="login-box-msg" id="titulo"></p>
+
+        <form action="add_preparacion_fisica" id="add_preparacion_fisica" method="post">
+            <div id="tok">
+
+            </div>
+            <fieldset>
+
+                <div class="form-group has-feedback">
+                    <select id="labor" name="labor" class="form-control">
+
+                    </select>
+                </div>
+
+                <div class="form-group has-feedback">
+                    <input class="form-control" id="area" name="area" type="text" required title="Area Adecuada" onkeyup="campos_completar_sub_pf()"/>
+                </div>
+
+                <div class="form-group has-feedback">
+                    <input class="form-control" id="precio" name="precio" placeholder="Precio por Hectarea" type="text" required title="Precio por Hectarea" onkeyup="campos_completar_sub_pf()"/>
+                </div>
+
+                <div class="form-group has-feedback">
+                    <input class="form-control" id="subtotal" name="subtotal" placeholder="Subtotal" type="text" required title="Subtotal" disabled/>
+                </div>
+
+                <div class="form-group has-feedback">
+                    <input class="form-control" id="fecha" name="fecha" placeholder="Fecha" type="text" required title="Fecha de la Preparación Fisica"/>
+                </div>
+
+
+
+
+
+          <div class="row">
+            <div class="col-xs-8">
+
+            </div>
+            <div class="col-xs-4">
+              <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+          </div>
+
+                </fieldset>
+        </form>
+
+      </div>
+    </div>
+<script>
+    var frm;
+    jQuery(document).ready(function(){
+
+        tipo = '<input name="tipo" value="'+hacienda_editar+'" type="hidden">';
+        if(hacienda_editar == '0' || hacienda_editar == 0){
+            $('#titulo').html('Nueva Prepareción Fisica de Suelo Por Metro Lineal');
+            $('#precio').attr('placeholder', 'Precio por Metro Lineal');
+            $('#precio').attr('title', 'Precio por Metro Lineal');
+
+            $('#area').attr('placeholder', 'Metros Lineales');
+            $('#area').attr('title', 'Metros Lineales');
+        }
+
+        else{
+            $('#titulo').html('Nueva Prepareción Fisica de Suelo Por Area');
+
+            $('#precio').attr('placeholder', 'Precio por Hectarea');
+            $('#precio').attr('title', 'Precio por Hectarea');
+
+            $('#area').attr('placeholder', 'Area Adecuada');
+            $('#area').attr('title', 'Area Adecuada');
+        }
+
+        $('#tok').html(token+tipo);
+
+        frm = $('#add_preparacion_fisica');
+        $("#fecha").datepicker().datepicker("setDate", new Date());
+        get_area_zona();
+        get_labores_preparacion(hacienda_editar);
+
+      });
+
+    function get_area_zona(){
+        $.ajax({
+            type: "GET",
+            url: "get_area_zona",
+            data: '',
+            success: function (data) {
+                $('#area').val(data)
+            },
+            error: function(data) {
+                console.log(data)
+            }
+        });
+        return false;
+    }
+
+    function get_labores_preparacion(tipo){
+        $.ajax({
+            type: "GET",
+            url: "get_labor_form",
+            data: {'tipo':tipo},
+            success: function (data) {
+                if (data.length == 0)
+                {
+                    UIkit.notify({
+                        message : 'No hay Labores Registradas',
+                        status  : 'warning',
+                        timeout : 3000,
+                        pos:'top-center'
+                    });
+                }
+                else{
+                    option = '<option value="0">Labores</option>';
+                    $('#labor').append(option);
+                    for (i=0; i< data.length; i++)
+                    {
+                        option = '<option value="'+data[i].pk+'">'+data[i].fields.labor+'</option>';
+                        $('#labor').append(option);
+                    }
+                }
+
+            },
+            error: function(data) {
+                console.log(data)
+            }
+        });
+        return false;
+    }
+
+    function campos_completar_sub_pf(){
+        a = $('#area').val();
+        c = $('#precio').val();
+
+        if (a == '' || c == ''){
+
+        }
+        else{
+            a = a*1;
+            c = c*1;
+
+            subt = a*c;
+            $('#subtotal').val(subt);
+        }
+    }
+
+    frm.submit(function () {
+        $('#subtotal').removeAttr('disabled');
+        $.ajax({
+            type: frm.attr('method'),
+            url: frm.attr('action'),
+            data: frm.serialize(),
+            success: function (data) {
+                $('#subtotal').attr('disabled','disabled');
+                if (data === 'error')
+                    {
+                        UIkit.notify({
+                            message : 'Upps! algo salio mal, revisa los datos XD',
+                            status  : 'danger',
+                            timeout : 5000,
+                            pos:'top-center'
+                        });
+                    }
+                else if (data === 'area')
+                    {
+                        UIkit.notify({
+                            message : 'El Area es Mayor que el Area de la Zona/Lote',
+                            status  : 'warning',
+                            timeout : 5000,
+                            pos:'top-center'
+                        });
+
+                    }
+                else if (data === 'zona')
+                    {
+                        UIkit.notify({
+                            message : 'Upps! algo salio mal con el proceso del formulario',
+                            status  : 'danger',
+                            timeout : 5000,
+                            pos:'top-center'
+                        });
+
+                    }
+                else
+                    {
+                        UIkit.notify({
+                            message : 'Preparacion Registada Con Exito',
+                            status  : 'success',
+                            timeout : 3000,
+                            pos:'top-center'
+                        });
+                        get_preparaciones_fisicas();
+                    }
+            },
+            error: function(data) {
+                alert(data);
+                console.log(data)
+            }
+        });
+        return false;
+    });
+</script>

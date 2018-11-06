@@ -1,0 +1,234 @@
+
+<div class="box box-success">
+                <div class="box-header">
+                  <h3 class="box-title">Filtro de Busqueda del Palmicultor</h3>
+                </div>
+                <div class="box-body">
+                  <div class="row">
+                    <div class="col-xs-2">
+                        <label for="nombre">NombreS</label>
+                        <input class="form-control" id="nombre" placeholder="Nombre del Palmicultor" type="text" onkeyup="campos_nom()">
+                    </div>
+
+                    <div class="col-xs-2">
+                        <label for="apellido">Apellidos</label>
+                        <input class="form-control" id="apellido" placeholder="Apellidos del Palmicultor" type="text" onkeyup="campos_apell()">
+                    </div>
+                    <div class="col-xs-2">
+                        <label for="documento">Documento</label>
+                        <input class="form-control" id="documento" placeholder="Número de Documento" type="text" onkeyup="campos_doc()">
+                    </div>
+                    <div class="col-xs-2">
+                        <label for="hacienda">Nombre de Hacienda</label>
+                        <input class="form-control" id="hacienda" placeholder="Nombre del Hacienda" type="text" onkeyup="campos_haci()">
+                    </div>
+
+                    <div class="col-xs-2">
+                        <label for="departamento">Departamento</label>
+                        <select class="form-control" id="departamento" onchange="campos_departamento()">
+
+                        </select>
+                    </div>
+
+                        <div class="col-xs-2">
+                            <label for="municipio">Municipio</label>
+                            <select class="form-control" id="municipio">
+
+                            </select>
+                        </div>
+
+                  </div>
+                    </br>
+
+                    <div class="row">
+                        <div class="col-xs-5">
+
+
+                        </div><!-- /.col -->
+                        <div class="col-xs-5">
+                            <button type="submit" class="btn btn-primary" onclick="buscar_filtro()">Buscar</button>
+                        </div><!-- /.col -->
+                    </div>
+
+                </div><!-- /.box-body -->
+              </div>
+
+
+<br/>
+<p class="login-logo">Resultados</p>
+<br/>
+<div id="lista_palmicultores" class="register-page">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Apellidos</th>
+                <th>Nombres</th>
+                <th>N° Documento</th>
+                <th>Email</th>
+                <th>Telefonos</th>
+                <th>Usuario</th>
+                <th>Editar</th>
+                <th>Contraseña</th>
+            </tr>
+        </thead>
+        <tbody id="body_palmicultores_filtro">
+
+        </tbody>
+    </table>
+</div>
+
+<script>
+
+    jQuery(document).ready(function() {
+        cargar_dep_filtro_admin();
+      });
+
+    function campos_apell(){
+       $('#documento').val('');
+        $('#nombre').val('');
+        $('#hacienda').val('');
+        $('#departamento').val('0');
+        $('#municipio').val('0');
+    }
+
+    function campos_nom(){
+        $('#documento').val('');
+        $('#apellido').val('');
+        $('#hacienda').val('');
+        $('#departamento').val('0');
+        $('#municipio').val('0');
+    }
+
+    function campos_doc(){
+        $('#nombre').val('');
+        $('#apellido').val('');
+        $('#hacienda').val('');
+        $('#departamento').val('0');
+        $('#municipio').val('0');
+    }
+
+    function cargar_dep_filtro_admin(){
+        $.ajax({
+            type: "GET",
+            url: "get_departamentos",
+            data: "",
+            success: function (data) {
+                console.log(data);
+                option = '<option value="0">Departamentos</option>';
+                $('#departamento').append(option);
+
+                for(i=0; i< data.length; i++)
+                {
+                    option = '<option value="'+data[i].pk+'">'+data[i].fields.nombre+'</option>';
+                    $('#departamento').append(option)
+                }
+
+            },
+            error: function(data) {
+                console.log(data)
+            }
+        });
+        return false;
+    }
+
+    function campos_haci(){
+        $('#nombre').val('');
+        $('#documento').val('');
+        $('#apellido').val('');
+        $('#departamento').val('0');
+        $('#municipio').val('0');
+    }
+
+    function campos_departamento(){
+        $('#nombre').val('');
+        $('#documento').val('');
+        $('#hacienda').val('');
+        $('#apellido').val('');
+        cargar_municipios_filtro_admin();
+    }
+
+    function cargar_municipios_filtro_admin(){
+        dep=$('#departamento').val();
+
+        if (dep == '0' || dep==0){
+            $('#municipio').html("");
+            return;
+        }
+
+        $.ajax({
+            type: "GET",
+            url: "get_municipios",
+            data: {"departamento":dep},
+            success: function (data) {
+                $('#municipio').html("");
+                option = '<option value="0">Municipios</option>';
+                $('#municipio').append(option);
+
+                for(i=0; i< data.length; i++)
+                {
+                    option = '<option value="'+data[i].pk+'">'+data[i].fields.nombre+'</option>'
+                    $('#municipio').append(option)
+                }
+            },
+            error: function(data) {
+                console.log(data)
+            }
+        });
+        return false;
+
+
+
+    }
+
+    function buscar_filtro(){
+        $.ajax({
+            type: "GET",
+            url: "get_palmicultores_filtro_admin",
+            data: {'nombre':$('#nombre').val(), 'documento':$('#documento').val(), 'hacienda':$('#hacienda').val(), 'departamento':$('#departamento').val(), 'municipio':$('#municipio').val(), 'apellido':$('#apellido').val() },
+            success: function (data) {
+                $('#body_palmicultores_filtro').html('');
+                if (data.length == 0)
+                {
+                    UIkit.notify({
+                        message : 'No hay Palmicultores segun la consulta',
+                        status  : 'warning',
+                        timeout : 4000,
+                        pos:'top-center'
+                    });
+
+                }
+                else{
+                    llenar_body_tabla_filtro_admin(data);
+                }
+
+            },
+            error: function(data) {
+                console.log(data)
+            }
+        });
+        return false;
+    }
+
+
+    function llenar_body_tabla_filtro_admin(data){
+        for (i=0; i< data.length; i++)
+        {
+            apellidos = '<td>'+data[i].fields.apellidos+'</td>';
+            nombres = '<td>'+data[i].fields.nombres+'</td>';
+            documento = '<td>'+data[i].fields.documento+'</td>';
+            email = '<td>'+data[i].fields.email+'</td>';
+            telefonos = '<td>'+data[i].fields.telefono+'</td>';
+
+            if (data[i].fields.activo == '1')
+                desactivar = '<td><button class="btn btn-success col-xs-6" onclick="desactivar_palmicultor('+data[i].pk+')" type="button">Desactivar</button></td>';
+            else
+                desactivar = '<td><button class="btn btn-success col-xs-4" onclick="desactivar_palmicultor('+data[i].pk+')" type="button">Activar</button></td>';
+
+            editar = '<td><button class="btn btn-success col-xs-4" onclick="editar_palmicultor_admin('+data[i].pk+')" type="button">Ir</button></td>';
+            contrasena = '<td><button class="btn btn-success col-xs-6" onclick="resetear_pass('+data[i].pk+')" type="button">Restaurar</button></td>';
+            fila = '<tr>'+apellidos+nombres+documento+email+telefonos+desactivar+editar+contrasena+'</tr>';
+            console.log(fila);
+            $('#body_palmicultores_filtro').append(fila);
+        }
+    }
+</script>

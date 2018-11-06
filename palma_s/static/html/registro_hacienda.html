@@ -1,0 +1,189 @@
+<div class="register-box">
+
+      <div class="register-box-body">
+        <p class="login-box-msg">Registro de Hacienda</p>
+
+        <form action="add_hacienda" id="new_hacienda" method="post">
+            <div id="tok">
+
+            </div>
+            <fieldset>
+
+
+            <div class="form-group has-feedback">
+                <input class="form-control" id="nombre" name="nombre" placeholder="Nombre" type="text" required/>
+            </div>
+            <div class="form-group has-feedback">
+                <input class="form-control" id="cedula" name="cedula" placeholder="Cedula Catastral" type="text" required/>
+            </div>
+                <!--
+
+            <div class="form-group has-feedback">
+                <input class="form-control" name="cedula" placeholder="Cedula catastral" type="text" id="cedula" required/>
+            </div>-->
+
+            <div class="form-group has-feedback">
+                <input class="form-control" name="direccion" placeholder="Dirección" type="text" id="direccion" required/>
+            </div>
+                <div class="form-group has-feedback">
+                    <input class="form-control" name="telefono" placeholder="Telefono-Celular" type="text" required title="Telefono"/>
+            </div>
+
+                <div class="row form-group">
+
+                    <div class="col-xs-6">
+                        <select id="departamento" name="departamento" class="form-control" onchange="get_municipios()">
+
+                        </select>
+                    </div>
+                    <div class="col-xs-6">
+                        <select id="municipio" name="municipio" class="form-control">
+
+                        </select>
+                    </div>
+                </div>
+                <div class="row form-group">
+
+                    <div class="col-xs-6">
+                        <input class="form-control" name="nucleo" placeholder="Nucleo Palmero" type="text" id="nucleo" required/>
+                    </div>
+                    <div class="col-xs-6">
+                        <input class="form-control" name="area" placeholder="Area en Hectareas" type="number" id="area" required/>
+                    </div>
+                </div>
+
+                <div class="form-group has-feedback">
+                    <textarea class="form-control" name="descripcion" placeholder="Descripción" type="" id="descripcion"></textarea>
+                </div>
+
+          <div class="row">
+            <div class="col-xs-8">
+
+            </div>
+            <div class="col-xs-4">
+              <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+          </div>
+
+                </fieldset>
+        </form>
+
+      </div>
+    </div>
+<script>
+    var frm;
+    jQuery(document).ready(function(){
+        $('#tok').html(token);
+        frm = $('#new_hacienda');
+        get_departamentos();
+      });
+
+    function get_departamentos(){
+        $.ajax({
+            type: "GET",
+            url: "get_departamentos",
+            data: "",
+            success: function (data) {
+                console.log(data);
+                option = '<option value="0">Departamento</option>';
+                $('#departamento').append(option);
+
+                for(i=0; i< data.length; i++)
+                {
+                    option = '<option value="'+data[i].pk+'">'+data[i].fields.nombre+'</option>'
+                    $('#departamento').append(option)
+                }
+
+            },
+            error: function(data) {
+                console.log(data)
+            }
+        });
+        return false;
+    }
+
+    function get_municipios(){
+        dep = $('#departamento').val();
+        if(dep=='o' || dep==0)
+        {
+            $('#municipio').html("");
+            return;
+        }
+        $.ajax({
+            type: "GET",
+            url: "get_municipios",
+            data: {"departamento":dep},
+            success: function (data) {
+                console.log(data)
+                $('#municipio').html("");
+                option = '<option value="0">Municipio</option>';
+                $('#municipio').append(option);
+
+                for(i=0; i< data.length; i++)
+                {
+                    option = '<option value="'+data[i].pk+'">'+data[i].fields.nombre+'</option>'
+                    $('#municipio').append(option)
+                }
+            },
+            error: function(data) {
+                console.log(data)
+            }
+        });
+        return false;
+    }
+
+    frm.submit(function () {
+
+        $.ajax({
+            type: frm.attr('method'),
+            url: frm.attr('action'),
+            data: frm.serialize(),
+            success: function (data) {
+                if (data === 'ok')
+                    {
+                        UIkit.notify({
+                            message : 'Hacienda Registada Con Exito',
+                            status  : 'success',
+                            timeout : 5000,
+                            pos:'top-center'
+                        });
+                        haciendas();
+                    }
+                else if (data === 'muni')
+                    {
+                        UIkit.notify({
+                            message : 'Seleciona Un Departamento o Municipio valido',
+                            status  : 'danger',
+                            timeout : 5000,
+                            pos:'top-center'
+                        });
+                    }
+                else if (data === 'error')
+                    {
+                        UIkit.notify({
+                            message : 'Hacienda ya registrada',
+                            status  : 'danger',
+                            timeout : 5000,
+                            pos:'top-center'
+                        });
+                    }
+                else
+                    {
+                        UIkit.notify({
+                            message : 'Upps! algo salio mal, revisa los datos de la nueva Hacienda',
+                            status  : 'danger',
+                            timeout : 5000,
+                            pos:'top-center'
+                        });
+                    }
+            },
+            error: function(data) {
+                alert(data);
+                console.log(data)
+            }
+        });
+        return false;
+    });
+
+
+</script>

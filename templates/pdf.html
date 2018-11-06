@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html">
+    <head>
+        <link rel="shortcut icon"  href="{{STATIC_URL}}img/ico.png">
+        <title>Reporte de Costos</title>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="{{STATIC_URL}}css/style.css">
+        <link rel="stylesheet" href="{{STATIC_URL}}css/bootstrap.min.css">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+        <script type="text/javascript" src="{{STATIC_URL}}js/jsapi.js"></script>
+
+        <script src="{{STATIC_URL}}js/plugins/jQuery/jQuery-2.1.3.min.js"></script>
+
+
+    </head>
+
+    <body>
+
+        <header class="container">
+            <div class="col-xs-1"></div>
+            <div class="col-xs-2"> <img  src="{{STATIC_URL}}img/logo.png"   width="100" height="100" class=""/></div>
+            <div class="col-xs-7"></div>
+            <div class="col-xs-2"> <img  src="{{STATIC_URL}}img/logo.png"   width="100" height="100" class=""/></div>
+        </header>
+
+        <div class="container" >
+
+
+            <div class="col-xs-12" id="central" >
+                <center>
+                    <h2 class="verde hidden-xs">Costos de <span class="naranja"> Establecimiento </span></h2>
+                    <h3 class="verde visible-xs">Costos de <span class="naranja"> Establecimiento </span></h3>
+                </center>
+                <br><br>
+            </div>
+            <div class="col-xs-12">
+                <div class="col-md-2"></div>
+                <div class="col-md-4">
+                    <table class="table table-bordered tablaP">
+                        <tr>
+                            <td><b>Total Corrección de Suelos</b></td>
+                            <td>{{ correccion }}</td>
+
+                        </tr>
+                        <tr>
+                            <td><b>Total Nivelación Suelos</b></td>
+                            <td>{{ nivelacion }}</td>
+                        </tr>
+                        <tr>
+                            <td><b>Total Preparación de Suelo</b></td>
+                            <td>{{ prepa_fisica }}</td>
+                        </tr>
+                        <tr>
+                            <td><b>Total Siembra Coberturas</b></td>
+                            <td>{{ siembra_cobertura }}</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="col-md-4">
+                    <table class="table table-bordered tablaP">
+                        <tr>
+                            <td><b>Total Palmas Para Siembra</b></td>
+                            <td>{{ Palmas_siembra }}</td>
+
+                        </tr>
+                        <tr>
+                            <td><b>Total Siembra De Palma</b></td>
+                            <td>{{ siembra_palma }}</td>
+                        </tr>
+                        <tr>
+                            <td><b>Otros</b></td>
+                            <td>{{ otro }}</td>
+                        </tr>                        
+                    </table>
+                </div>
+                <div class="col-md-2"></div>
+            </div>
+
+            <div class="col-md-12">
+                <div class="col-md-4"></div>
+                <div class="col-md-4">
+                    <table class="table table-bordered tablaP">
+                        <tr>
+                            <td><b>Total Costos de Establecimiento</b></td>
+                            <td id="total">{{ total }}</td>
+                        </tr>                                          
+                    </table>
+                </div>
+                <div class="col-md-4"></div>
+            </div>
+
+
+            <div class="col-md-12">
+                <div class="col-md-3"></div>
+                <div class="col-md-5">
+                    <div id="piechart_3d" style="width: 900px; height: 500px;"></div>
+                </div>
+                <div class="col-md-4"></div>
+            </div>
+            
+            <center><input type="button" value="Imprimir Reporte" onclick="imprimir()"></center>
+        </div>
+
+
+
+
+
+
+        <footer class="z-index-3">
+
+            <div class="icon_box">
+                <a> <!-- <img src="{{STATIC_URL}}img/is-icon.png"/>--></a>
+            </div>
+
+        </footer>
+
+    </body>
+
+</html>
+
+<script>
+
+
+        google.load("visualization", "1", {packages: ["corechart"]});
+        google.setOnLoadCallback(drawChart);
+
+            function drawChart() {
+                c = {{ correccion }}
+                n = {{ nivelacion }}
+                p = {{ prepa_fisica }}
+                s = {{ siembra_cobertura }}
+                ps = {{ Palmas_siembra }}
+                sp = {{ siembra_palma }}
+                o = {{ otro }}
+                t = {{ total }}
+                var data = google.visualization.arrayToDataTable([
+                    ['Costos', 'Costo Invertido'],
+                    ['Corrección de Suelos', c],
+                    ['Nivelación de Suelos', n],
+                    ['Preparación de Suelos', p],
+                    ['Siembras de Coberturas', s],
+                    ['Palmas Para Siembra', ps],
+                    ['Siembra De Palma', sp],
+                    ['Otros', o]
+                ]);
+
+                var options = {
+                    title: 'Costos de Establecimiento',
+                    is3D: true,
+                };
+
+                var chart = new google.visualization.PieChart(document.getElementById('piechart_3d'));
+                chart.draw(data, options);
+            }
+
+    function imprimir(){
+        window.print();
+    }
+
+
+
+</script>

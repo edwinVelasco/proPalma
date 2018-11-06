@@ -1,0 +1,89 @@
+<div class="register-box">
+      <div class="register-logo">
+        <a href="/"><b>Home </b>ProPalma</a>
+      </div>
+
+      <div class="register-box-body">
+        <p class="login-box-msg">Ver Información de Lote/Zona</p>
+
+        <form id="editar_zona" >
+            <div id="tok">
+
+            </div>
+            <fieldset>
+            <div class="form-group has-feedback">
+                <input class="form-control" id="codigo" name="codigo" placeholder="CÓdigo" type="text" required title="Codigo" disabled/>
+            </div>
+
+            <div class="form-group has-feedback">
+                <input class="form-control" id="area" name="area" placeholder="Área" type="number" required title="Area" disabled/>
+            </div>
+
+            <div class="form-group has-feedback">
+                <input class="form-control" id="capacidad" name="capacidad" placeholder="Capacidad de Palmas" type="number" required title="Capacidad de Palmas" disabled/>
+            </div>
+
+
+
+            <div class="form-group has-feedback">
+                    <input class="form-control" id="fecha" name="fecha" placeholder="Fecha Plantación" title="Fecha Plantación" disabled/>
+            </div>
+
+
+
+                </fieldset>
+        </form>
+          <div class="row">
+            <div class="col-xs-3">
+              <div class="checkbox icheck">
+                <label>
+                  <!-- <input type="checkbox"> I agree to the <a href="#">terms</a>-->
+                </label>
+              </div>
+
+            </div><!-- /.col -->
+            <div class="col-xs-9">
+              <button type="submit" class="btn btn-primary" onclick="haciendas()">Salir</button>
+            </div><!-- /.col -->
+          </div>
+      </div><!-- /.form-box -->
+    </div><!-- /.register-box -->
+
+<script>
+    jQuery(document).ready(function(){
+        get_zona();
+      });
+
+    function get_zona(){
+        $.ajax({
+            type: 'GET',
+            url: 'get_zona',
+            data: {'id' : hacienda_editar},
+            success: function (data) {
+                datos = data.split(',');
+                /*
+                    datos[0] = area
+                     datos[1] = capacidad
+                     datos[2] = codigo
+                     datos[3] = fecha
+                     datos[4] = activo
+                 */
+
+                $('#area').val(datos[0]);
+                $('#capacidad').val(datos[1]);
+                $('#codigo').val(datos[2]);
+                $('#fecha').val(datos[3]);
+
+                if (datos[4] == 0 || datos[4] == '0')
+                    $('#activo').attr('checked', true);
+
+            },
+            error: function(data) {
+                alert(data);
+                console.log(data)
+            }
+        });
+        return false;
+    }
+
+</script>

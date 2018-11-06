@@ -1,0 +1,81 @@
+<div class="register-box">
+
+      <div class="register-box-body">
+        <p class="login-box-msg">Registro de Fertilizante</p>
+
+        <form action="add_fertilizante" id="add_fertilizante" method="post">
+            <div id="tok">
+
+            </div>
+            <fieldset>
+
+
+            <div class="form-group has-feedback">
+                <input class="form-control" id="nombre" name="nombre" placeholder="Nombre del Fertilizante" type="text" required title="Nombre del Fertilizante"/>
+            </div>
+
+          <div class="row">
+            <div class="col-xs-8">
+
+            </div>
+            <div class="col-xs-4">
+              <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+          </div>
+
+                </fieldset>
+        </form>
+
+      </div>
+    </div>
+<script>
+    var frm;
+    jQuery(document).ready(function(){
+        $('#tok').html(token);
+        frm = $('#add_fertilizante');
+      });
+
+    frm.submit(function () {
+        $.ajax({
+            type: frm.attr('method'),
+            url: frm.attr('action'),
+            data: frm.serialize(),
+            success: function (data) {
+                if (data === 'ok')
+                    {
+                        UIkit.notify({
+                            message : 'Fertilizante, Registro Exitoso',
+                            status  : 'success',
+                            timeout : 3000,
+                            pos:'top-center'
+                        });
+                        get_fertilizantes();
+                    }
+                else if(data === 'ya')
+                {
+                    UIkit.notify({
+                        message : 'El Fertilizante ya se Encuentra Registrado',
+                        status  : 'warning',
+                        timeout : 3000,
+                        pos:'top-center'
+                    });
+                }
+                else
+                    {
+                        UIkit.notify({
+                            message : 'Upps! algo salio mal' ,
+                            status  : 'danger',
+                            timeout : 3000,
+                            pos:'top-center'
+                        });
+                    }
+            },
+            error: function(data) {
+                alert(data);
+                console.log(data)
+            }
+        });
+        return false;
+    });
+
+</script>

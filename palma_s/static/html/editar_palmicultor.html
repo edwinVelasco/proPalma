@@ -1,0 +1,320 @@
+<div class="register-box">
+
+      <div class="register-box-body">
+        <p class="login-box-msg">Editar Datos</p>
+
+        <form action="editar_palmicultor" id="editar_palmicultor" method="post" >
+            <div id="tok">
+
+            </div>
+            <fieldset>
+
+
+            <div class="form-group has-feedback">
+                <input class="form-control" id="nombres" name="nombres" placeholder="Nombres" type="text" required disabled/>
+            </div>
+
+            <div class="form-group has-feedback">
+                <input class="form-control" name="apellidos" placeholder="Apellidos" type="text" id="apellidos" required disabled/>
+            </div>
+
+            <div class="form-group has-feedback">
+                <input class="form-control" name="email" placeholder="Email" type="email" id="email" required/>
+            </div>
+
+
+                <div class="row form-group">
+                    <div class="col-xs-6">
+                        <select id="tipoDocumento" name="tipoDocumento" class="form-control" disabled>
+
+                        </select>
+                    </div>
+                    <div class="col-xs-6">
+                        <input class="form-control" id="numDocumento" name="numDocumento" placeholder="Documento" type="text" required disabled/>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-xs-6">
+                        <select name="genero" id="genero" class="form-control" disabled>
+                            <option value="0">
+                                Sexo-Genero
+                            </option>
+                            <option value="1">
+                                Masculino
+                            </option>
+                            <option value="2">
+                                Femenino
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-xs-6">
+                        <select id="departamento" name="departamento" class="form-control" onchange="get_municipios()">
+
+                        </select>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-xs-6">
+                        <select id="municipio" name="municipio" class="form-control">
+
+                        </select>
+                    </div>
+                    <div class="col-xs-6">
+                        <input class="form-control" id="direccionResidencia" name="direccionResidencia" placeholder="Direccion" type="text" required/>
+                    </div>
+            </div>
+            <div class="form-group has-feedback">
+                    <input class="form-control" name="telefono" placeholder="Teléfono de Contacto" type="text" id="telefono" required title="Teléfono de Contacto"/>
+            </div>
+                <div class="row form-group">
+                    <div class="col-xs-6">
+                        <input class="form-control" name="zona" placeholder="Zona Palmeroqa" type="text" id="zona" required disabled title="Zona Palmeroqa"/>
+                    </div>
+                    <div class="col-xs-6">
+                        <input class="form-control" id="cedula_palmera" name="cedula_palmera" placeholder="Cedula Palmera" type="text" title="Cedula Palmera"/>
+                    </div>
+                </div>
+          <div class="row">
+            <div class="col-xs-8">
+              <div class="checkbox icheck">
+                <label>
+                  <!-- <input type="checkbox"> I agree to the <a href="#">terms</a>-->
+                </label>
+              </div>
+
+            </div><!-- /.col -->
+            <div class="col-xs-4">
+              <button type="submit" class="btn btn-success">Guardar</button>
+            </div><!-- /.col -->
+          </div>
+
+                </fieldset>
+        </form>
+
+          <div class="row">
+            <div class="col-xs-3">
+              <div class="checkbox icheck">
+                <label>
+                  <!-- <input type="checkbox"> I agree to the <a href="#">terms</a>-->
+                </label>
+              </div>
+
+            </div><!-- /.col -->
+            <div class="col-xs-9">
+              <button type="submit" class="btn btn-primary" onclick="editar_password()">Editar Contraseña</button>
+            </div><!-- /.col -->
+          </div>
+
+      </div><!-- /.form-box -->
+    </div><!-- /.register-box -->
+<script>
+    var frm;
+    var municipio;
+
+    jQuery(document).ready(function() {
+
+        get_tipos_documentos();
+        get_departamentos();
+        $('#tok').html(token);
+        frm = $('#editar_palmicultor');
+        get_palmicultor();
+      });
+
+    function get_palmicultor(){
+        $.ajax({
+            type: "GET",
+            url: "get_palmicultor",
+            data: "",
+            success: function (data) {
+                datos = data.split(',');
+                console.log(data);
+                /*
+                datos[0] --> nombres
+                datos[1] --> apellidos
+                datos[2] --> email
+                datos[3] --> tipo de documento
+                datos[4] --> documento
+                datos[5] --> genero
+                datos[6] --> municipio
+                datos[7] --> direccion
+                datos[8] --> telefono
+                datos[9] --> cedula_palmera
+
+                */
+                $('#nombres').val(datos[0]);
+                $('#apellidos').val(datos[1]);
+                $('#email').val(datos[2]);
+                $('#tipoDocumento').val(datos[3]);
+                $('#numDocumento').val(datos[4]);
+                $('#genero').val(datos[5]);
+                $('#direccionResidencia').val(datos[7]);
+                $('#telefono').val(datos[8]);
+                dep = datos[6].split('+');
+                $('#departamento').val(dep[1]);
+                $('#cedula_palmera').val(datos[9]);
+
+                municipio = dep[0];
+                get_municipios();
+                asignar_zona();
+            },
+            error: function(data) {
+                console.log(data)
+            }
+        });
+        return false;
+    }
+
+    function get_departamentos(){
+        $.ajax({
+            type: "GET",
+            url: "get_departamentos",
+            data: "",
+            success: function (data) {
+                console.log(data);
+                option = '<option value="0">Departamento</option>';
+                $('#departamento').append(option);
+
+                for(i=0; i< data.length; i++)
+                {
+                    option = '<option value="'+data[i].pk+'">'+data[i].fields.nombre+'</option>'
+                    $('#departamento').append(option)
+                }
+
+            },
+            error: function(data) {
+                console.log(data)
+            }
+        });
+        return false;
+    }
+
+    function get_tipos_documentos(){
+        $.ajax({
+            type: "GET",
+            url: "get_tipos_documento",
+            data: "",
+            success: function (data) {
+                console.log(data)
+                option = '<option value="0">Tipo Documento</option>';
+                $('#tipoDocumento').append(option);
+
+                for(i=0; i< data.length; i++)
+                {
+                    option = '<option value="'+data[i].pk+'">'+data[i].fields.tipo+'</option>'
+                    $('#tipoDocumento').append(option)
+                }
+            },
+            error: function(data) {
+                console.log(data)
+            }
+        });
+        return false;
+    }
+
+    function get_municipios(){
+        dep = $('#departamento').val()
+        if(dep=='o' || dep==0)
+        {
+            $('#municipio').html("");
+            return;
+        }
+        asignar_zona();
+
+        $.ajax({
+            type: "GET",
+            url: "get_municipios",
+            data: {"departamento":dep},
+            success: function (data) {
+                console.log(data)
+                $('#municipio').html("");
+                option = '<option value="0">Municipio</option>';
+                $('#municipio').append(option);
+
+                for(i=0; i< data.length; i++)
+                {
+                    option = '<option value="'+data[i].pk+'">'+data[i].fields.nombre+'</option>'
+                    $('#municipio').append(option)
+                }
+
+                if (municipio != "")
+                {
+                    $('#municipio').val(municipio);
+                    municipio="";
+                }
+
+
+            },
+            error: function(data) {
+                console.log(data)
+            }
+        });
+        return false;
+    }
+
+    frm.submit(function () {
+        $('#zona').removeAttr('disabled');
+        $.ajax({
+            type: frm.attr('method'),
+            url: frm.attr('action'),
+            data: frm.serialize(),
+            success: function (data) {
+                $('#zona').attr('disabled','disabled');
+                if (data === 'ok')
+                    {
+                        UIkit.notify({
+                            message : 'Palmicultor Editado Con Exito',
+                            status  : 'success',
+                            timeout : 5000,
+                            pos:'top-center'
+                        });
+                        haciendas();
+                    }
+                else
+                    {
+                        UIkit.notify({
+                            message : 'Upps! algo salio mal, revisa los datos XD',
+                            status  : 'danger',
+                            timeout : 5000,
+                            pos:'top-center'
+                        });
+                    }
+            },
+            error: function(data) {
+                alert(data);
+                console.log(data)
+            }
+        });
+        return false;
+    });
+
+    function editar_password(){
+        $("#cuerpo").load( "../static/html/editar_password.html");
+    }
+
+    function asignar_zona(){
+        dpto = $('#departamento').val();
+        if(dpto== '0')
+        {
+            $('#zona').val('');
+        }
+        else if(dpto == '18' || dpto == '19' || dpto == '11' || dpto == '4' || dpto == '2' || dpto == '28' || dpto == '13' ||dpto == '26')//
+        {
+            $('#zona').val('Zona Norte');
+        }
+        else if(dpto == '27' || dpto == '22' || dpto == '5' || dpto == '6' || dpto == '3')//
+        {
+            $('#zona').val('Zona Central');
+        }
+        else if(dpto == '20' || dpto == '14' || dpto == '9' || dpto == '8' || dpto == '32' || dpto == '15' || dpto == '16')//
+        {
+            $('#zona').val('Zona Oriental');
+        }
+        else if(dpto == '21' || dpto == '10' || dpto == '12' || dpto == '30' || dpto == '25' || dpto == '7' || dpto == '24' || dpto == '29' || dpto == '17' )//
+        {
+            $('#zona').val('Zona Occidental');
+        }
+        else{
+            $('#zona').val('Zona Sur');
+        }
+    }
+</script>

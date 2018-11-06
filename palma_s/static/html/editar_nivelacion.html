@@ -1,0 +1,244 @@
+<div class="register-box">
+
+      <div class="register-box-body">
+        <p class="login-box-msg">Edición de Nivelación de Nutrientes</p>
+
+        <form action="editar_nivelacion" id="editar_nivelacion" method="post">
+            <div id="tok">
+
+            </div>
+            <fieldset>
+
+                <div class="row form-group">
+                    <div class="col-xs-6">
+                        <select id="unidad" name="unidad" class="form-control" >
+
+                        </select>
+                    </div>
+                    <div class="col-xs-6">
+                        <input class="form-control" id="area" name="area" placeholder="Area" type="number" required title="Area de Aplicacion de la Enmienda" disabled/>
+                    </div>
+                </div>
+
+                <div class="row form-group">
+                    <div class="col-xs-6">
+                        <select id="fertilizante" name="fertilizante" class="form-control" title="Fertilzante Aplicado">
+
+                        </select>
+                    </div>
+                    <div class="col-xs-6">
+                        <input class="form-control" id="cantidad" name="cantidad" placeholder="Cantidad" type="number" required title="Cantidad" value="1" onkeyup="campos_completar()"/>
+                    </div>
+                </div>
+
+                <div class="row form-group">
+                    <div class="col-xs-6">
+                        <input class="form-control" id="precio_fer" name="precio_fer" placeholder="Precio del Fertiizante" type="number" required title="Precio del Fertilizante"  onkeyup="campos_completar()" value="1"/>
+                    </div>
+                    <div class="col-xs-6">
+                        <input class="form-control" id="subtotal" name="subtotal" placeholder="SubTotal" type="number" required title="SubTotal" disabled/>
+                    </div>
+                </div>
+
+                <div class="row form-group">
+                    <div class="col-xs-6">
+                        <input class="form-control" id="precio_apli" name="precio_apli" placeholder="Precio Aplicación" type="number" required title="Precio de Aplicacion de la Enmienda" value="1" />
+                    </div>
+                    <div class="col-xs-6">
+                        <input class="form-control" id="fecha" name="fecha" placeholder="Fecha" type="text" required title="Fecha de Aplicación de la Enmienda"/>
+                    </div>
+                </div>
+
+
+
+          <div class="row">
+            <div class="col-xs-8">
+
+            </div>
+            <div class="col-xs-4">
+              <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+          </div>
+
+                </fieldset>
+        </form>
+
+      </div>
+    </div>
+<script>
+    var area = 1;
+    var cantidad = 1;
+    var precio_en = 1;
+
+    jQuery(document).ready(function(){
+        etiqueta_id = '<input name="id" value="'+hacienda_editar+'" type="hidden">'
+        $('#tok').html(token+etiqueta_id);
+        frm = $('#editar_nivelacion');
+        $("#fecha").datepicker();
+        get_unidades_nivelacion();
+        get_fertilizante_nivelacion();
+    });
+
+    function get_nivelacion_editar()
+    {
+        $.ajax({
+            type: 'GET',
+            url: 'get_nivelacion_editar',
+            data: {'id' : hacienda_editar},
+            success: function (data) {
+                salida = data.split(',');
+                /**
+                 * salida[0] --> unidad
+                 * salida[1] --> area_lote
+                 * salida[2] --> fertilzante
+                 * salida[3] --> cantidad
+                 * salida[4] --> precio_fertilizante
+                 * salida[5] --> subtotal
+                 * salida[6] --> $ aplicacion
+                 * salida[7] --> fecha
+                 *
+                 */
+
+                $('#unidad').val(salida[0]);
+                $('#area').val(salida[1]);
+                $('#fertilizante').val(salida[2]);
+                $('#cantidad').val(salida[3]);
+                $('#precio_fer').val(salida[4]);
+                $('#subtotal').val(salida[5]);
+                $('#precio_apli').val(salida[6]);
+                $('#fecha').val(salida[7]);
+
+            },
+            error: function(data) {
+                alert(data);
+                console.log(data)
+            }
+        });
+        return false;
+
+    }
+
+
+    function get_unidades_nivelacion(){
+        $.ajax({
+            type: "GET",
+            url: "get_unidades",
+            data: {'tipo':'p'},
+            success: function (data) {
+                if (data.length == 0)
+                {
+                    UIkit.notify({
+                        message : 'No hay Unidades Registradas',
+                        status  : 'warning',
+                        timeout : 4000,
+                        pos:'top-center'
+                    });
+                }
+                else{
+                    option = '<option value="0">Unidades</option>';
+                    $('#unidad').append(option);
+                    for (i=0; i< data.length; i++)
+                    {
+                        option = '<option value="'+data[i].pk+'">'+data[i].fields.unidad+'</option>';
+                        $('#unidad').append(option);
+                    }
+                }
+
+            },
+            error: function(data) {
+                console.log(data)
+            }
+        });
+        return false;
+    }
+
+    function get_fertilizante_nivelacion(){
+        $.ajax({
+            type: "GET",
+            url: "get_fertilizantes",
+            data: "",
+            success: function (data) {
+                if (data.length == 0)
+                {
+                    UIkit.notify({
+                        message : 'No hay Enmiendas Registradas',
+                        status  : 'warning',
+                        timeout : 4000,
+                        pos:'top-center'
+                    });
+                }
+                else{
+                    option = '<option value="0">Fertilizantes</option>';
+                    $('#fertilizante').append(option);
+                    for (i=0; i< data.length; i++)
+                    {
+                        option = '<option value="'+data[i].pk+'">'+data[i].fields.fertilizante+'</option>';
+                        $('#fertilizante').append(option);
+                    }
+                }
+                get_nivelacion_editar();
+            },
+            error: function(data) {
+                console.log(data)
+            }
+        });
+        return false;
+    }
+
+    function campos_completar(){
+        a = $('#area').val();
+        c = $('#cantidad').val();
+        p = $('#precio_fer').val();
+        if (a == '' || c == '' || p == ''){
+
+        }
+        else{
+            area = a*1;
+            cantidad = c*1;
+            precio_en = p*1;
+            subt = area*cantidad*precio_en;
+            $('#subtotal').val(subt);
+            aplicacion = subt*0.1;
+            $('#precio_apli').val(aplicacion.toFixed(2));
+        }
+    }
+
+    frm.submit(function () {
+        $('#subtotal').removeAttr('disabled');
+        $('#area').removeAttr('disabled');
+        $.ajax({
+            type: frm.attr('method'),
+            url: frm.attr('action'),
+            data: frm.serialize(),
+            success: function (data) {
+                $('#subtotal').attr('disabled','disabled');
+                $('#area').attr('disabled','disabled');
+                if (data === 'error')
+                    {
+                        UIkit.notify({
+                            message : 'Upps! algo salio mal, revisa los datos XD',
+                            status  : 'danger',
+                            timeout : 5000,
+                            pos:'top-center'
+                        });
+                    }
+                else
+                    {
+                        UIkit.notify({
+                            message : 'Nivelación Registada Con Exito',
+                            status  : 'success',
+                            timeout : 3000,
+                            pos:'top-center'
+                        });
+                        get_nivelacion_nutrientes();
+                    }
+            },
+            error: function(data) {
+                alert(data);
+                console.log(data)
+            }
+        });
+        return false;
+    });
+
+</script>

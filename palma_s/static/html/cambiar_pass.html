@@ -1,0 +1,87 @@
+<div class="register-box">
+
+      <div class="register-box-body">
+        <p class="login-box-msg"></p>
+
+        <form action="recuperar_password" id="recuperar_password" method="post">
+            <div id="tok">
+
+            </div>
+            <fieldset>
+
+            <div class="form-group has-feedback">
+                <input class="form-control" name="new1" placeholder="Nueva Contraseña" type="password" id="new1" required title="Nueva Contraseña"/>
+            </div>
+
+            <div class="form-group has-feedback">
+                <input class="form-control" name="new2" placeholder="Repetir Nueva Contraseña" type="password" id="new2" required title="Repetir Nueva Contraseña"/>
+            </div>
+
+          <div class="row">
+            <div class="col-xs-8">
+
+            </div>
+            <div class="col-xs-4">
+              <button type="submit" class="btn btn-success">Guardar</button>
+            </div>
+          </div>
+
+                </fieldset>
+        </form>
+
+      </div>
+    </div>
+<script>
+    var frm;
+    jQuery(document).ready(function(){
+        usuario = '<input name="id" value="'+documento+'" type="hidden">';
+        $('#tok').html(token+usuario);
+        frm = $('#recuperar_password');
+      });
+
+    frm.submit(function () {
+        $.ajax({
+            type: frm.attr('method'),
+            url: frm.attr('action'),
+            data: frm.serialize(),
+            success: function (data) {
+                if (data === 'ok')
+                    {
+                        UIkit.notify({
+                            message : 'Password Cambiada con exito',
+                            status  : 'success',
+                            timeout : 5000,
+                            pos:'top-center'
+                        });
+                        login();
+
+                    }
+                else if (data === 'new')
+                    {
+                        UIkit.notify({
+                            message : 'Upps! algo salio mal, revisa que las contraseñas nuevas sean iguales',
+                            status  : 'danger',
+                            timeout : 5000,
+                            pos:'top-center'
+                        });
+                    }
+                else
+                    {
+                        UIkit.notify({
+                            message : 'Upps! algo salio mal, Faltan datos del formulario',
+                            status  : 'danger',
+                            timeout : 5000,
+                            pos:'top-center'
+                        });
+                    }
+            },
+            error: function(data) {
+                alert(data);
+                console.log(data)
+            }
+        });
+        return false;
+    });
+
+
+</script>

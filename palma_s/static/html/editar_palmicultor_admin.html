@@ -1,0 +1,163 @@
+<div class="register-box">
+
+      <div class="register-box-body">
+        <p class="login-box-msg">Editar Datos</p>
+
+        <form action="editar_palmicultor_admin" id="editar_palmicultor" method="post" >
+            <div id="tok">
+
+            </div>
+            <fieldset>
+
+
+            <div class="form-group has-feedback">
+                <input class="form-control" id="nombres" name="nombres"  type="text" required title="Nombres"/>
+            </div>
+
+            <div class="form-group has-feedback">
+                <input class="form-control" name="apellidos"  type="text" id="apellidos" required title="Apellidos"/>
+            </div>
+
+            <div class="form-group has-feedback">
+                <input class="form-control" name="cedula_palmera"  type="text" id="cedula_palmera" title="Cedula Palmera"/>
+            </div>
+
+
+                <div class="row form-group">
+                    <div class="col-xs-6">
+                        <select id="tipoDocumento" name="tipoDocumento" class="form-control" title="tipo de documento">
+
+                        </select>
+                    </div>
+                    <div class="col-xs-6">
+                        <input class="form-control" id="numDocumento" name="numDocumento" placeholder="Documento" type="text" required title="número de documento"/>
+                    </div>
+                </div>
+
+
+          <div class="row">
+            <div class="col-xs-8">
+              <div class="checkbox icheck">
+                <label>
+                  <!-- <input type="checkbox"> I agree to the <a href="#">terms</a>-->
+                </label>
+              </div>
+
+            </div><!-- /.col -->
+            <div class="col-xs-4">
+              <button type="submit" class="btn btn-success">Guardar</button>
+            </div><!-- /.col -->
+          </div>
+
+                </fieldset>
+        </form>
+
+
+      </div><!-- /.form-box -->
+    </div><!-- /.register-box -->
+<script>
+
+    jQuery(document).ready(function() {
+        get_tipos_documentos();
+        etiqueta_id = '<input name="id" value="'+hacienda_editar+'" type="hidden">';
+        $('#tok').html(token+etiqueta_id);
+        frm = $('#editar_palmicultor');
+        get_palmicultor();
+    });
+
+    function get_palmicultor(){
+        $.ajax({
+            type: "GET",
+            url: "get_palmicultor_admin",
+            data: {'id':hacienda_editar},
+            success: function (data) {
+                datos = data.split(',');
+                console.log(data);
+                /*
+                datos[0] --> nombres
+                datos[1] --> apellidos
+                datos[2] --> cedula_palmera
+                datos[3] --> tipo de documento
+                datos[4] --> documento
+                */
+
+                $('#nombres').val(datos[0]);
+                $('#apellidos').val(datos[1]);
+                $('#cedula_palmera').val(datos[2]);
+                $('#tipoDocumento').val(datos[3]);
+                $('#numDocumento').val(datos[4]);
+            },
+            error: function(data) {
+                console.log(data)
+            }
+        });
+        return false;
+    }
+
+    frm.submit(function () {
+        $.ajax({
+            type: frm.attr('method'),
+            url: frm.attr('action'),
+            data: frm.serialize(),
+            success: function (data) {
+                if (data === 'ok')
+                    {
+                        UIkit.notify({
+                            message : 'Palmicultor Editado Con Exito',
+                            status  : 'success',
+                            timeout : 5000,
+                            pos:'top-center'
+                        });
+                        get_filtro_palmicultores();
+                    }
+                else if (data === 'documento')
+                    {
+                        UIkit.notify({
+                            message : 'Número de documento ya registrado',
+                            status  : 'danger',
+                            timeout : 5000,
+                            pos:'top-center'
+                        });
+                    }
+                else
+                    {
+                        UIkit.notify({
+                            message : 'Upps! algo salio mal, revisa los datos XD',
+                            status  : 'danger',
+                            timeout : 5000,
+                            pos:'top-center'
+                        });
+                    }
+            },
+            error: function(data) {
+                alert(data);
+                console.log(data)
+            }
+        });
+        return false;
+    });
+
+    function get_tipos_documentos(){
+        $.ajax({
+            type: "GET",
+            url: "get_tipos_documento",
+            data: "",
+            success: function (data) {
+                console.log(data)
+                option = '<option value="0">Tipo Documento</option>';
+                $('#tipoDocumento').append(option);
+
+                for(i=0; i< data.length; i++)
+                {
+                    option = '<option value="'+data[i].pk+'">'+data[i].fields.tipo+'</option>'
+                    $('#tipoDocumento').append(option)
+                }
+            },
+            error: function(data) {
+                console.log(data)
+            }
+        });
+        return false;
+    }
+
+</script>

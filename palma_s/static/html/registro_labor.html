@@ -1,0 +1,110 @@
+<div class="register-box">
+
+      <div class="register-box-body">
+        <p class="login-box-msg">Registro de Labores</p>
+
+        <form action="add_labor" id="add_labor" method="post">
+            <div id="tok">
+
+            </div>
+            <fieldset>
+
+
+            <div class="form-group has-feedback">
+                <input class="form-control" id="nombre" name="nombre" placeholder="Nombre de la labor" type="text" required/>
+            </div>
+
+            <div class="form-group">
+
+                <div class="radio">
+                    <label>
+                        <input name="tipo" id="metro" value="0" checked="" type="radio">
+                        PFS x Metro Lineal
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input name="tipo" id="area" value="1"  type="radio">
+                            PFS x Area
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input name="tipo" id="siembra" value="2" type="radio">
+                            Siembra Palma
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input name="tipo" id="otros" value="3" type="radio">
+                        Otros CE
+                    </label>
+                </div>
+            </div>
+
+
+          <div class="row">
+            <div class="col-xs-8">
+
+            </div>
+            <div class="col-xs-4">
+              <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+          </div>
+
+                </fieldset>
+        </form>
+
+      </div>
+    </div>
+
+<script>
+    var frm;
+    jQuery(document).ready(function(){
+        $('#tok').html(token);
+        frm = $('#add_labor');
+      });
+
+    frm.submit(function () {
+        $.ajax({
+            type: frm.attr('method'),
+            url: frm.attr('action'),
+            data: frm.serialize(),
+            success: function (data) {
+                if (data === 'ok')
+                    {
+                        UIkit.notify({
+                            message : 'Labor, Registrado con Exito',
+                            status  : 'success',
+                            timeout : 3000,
+                            pos:'top-center'
+                        });
+                        get_labores();
+                    }
+                else if (data === 'ya'){
+                    UIkit.notify({
+                        message : 'Labor, ya ha sido Rregistrado con anterioridad' ,
+                        status  : 'danger',
+                        timeout : 3000,
+                        pos:'top-center'
+                    });
+                }
+                else
+                    {
+                        UIkit.notify({
+                            message : 'Upps! algo salio mal' ,
+                            status  : 'danger',
+                            timeout : 3000,
+                            pos:'top-center'
+                        });
+                    }
+            },
+            error: function(data) {
+                alert(data);
+                console.log(data)
+            }
+        });
+        return false;
+    });
+
+</script>

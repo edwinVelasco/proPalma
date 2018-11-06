@@ -1,0 +1,105 @@
+<div class="login-box">
+      <div class="login-logo">
+        <a href="/"><b>Home </b>ProPalma</a>
+      </div><!-- /.login-logo -->
+      <div class="login-box-body">
+        <p class="login-box-msg">Sign in to start your session</p>
+        <form action="loguear" method="post" id="login">
+            <div id="tok">
+
+            </div>
+
+          <div class="form-group has-feedback">
+            <input type="text" class="form-control" placeholder="Número de Documento" name="documento" id="documento" required title="Número de Documento"/>
+            <span class="glyphicon glyphicon-user form-control-feedback"></span>
+          </div>
+
+          <div class="form-group has-feedback">
+            <input type="password" class="form-control" placeholder="Contraseña" name="password" id="password" required title="Contraseña"/>
+            <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+          </div>
+
+          <div class="row">
+
+            <div class="col-xs-8">
+              <div class="checkbox icheck">
+                <label>
+
+                </label>
+              </div>
+            </div><!-- /.col -->
+
+            <div class="col-xs-4">
+              <button type="submit" class="btn btn-primary btn-block btn-flat">Entrar</button>
+            </div><!-- /.col -->
+          </div>
+
+        </form>
+
+        <br/>
+
+        <a href="javascript:;" onclick="pedir_documento()">Olvido su Contraseña?</a><br>
+
+      </div><!-- /.login-box-body -->
+    </div><!-- /.login-box -->
+<script>
+    var frm;
+    jQuery(document).ready(function(){
+        $('#tok').html(token);
+        frm = $('#login');
+      });
+
+    frm.submit(function(){
+        $.ajax({
+            type: frm.attr('method'),
+            url: frm.attr('action'),
+            data: frm.serialize(),
+            success: function (data) {
+                if (data === 'ok')
+                    {
+                        //alert('sesion inicada');
+                        window.location= '/login';
+                    }
+                else if(data === 'inactivo')
+                    {
+                        UIkit.notify({
+                            message : 'El Usario esta inactivo',
+                            status  : 'danger',
+                            timeout : 5000,
+                            pos:'top-center'
+                        });
+                    }
+                else if(data === 'password')
+                    {
+                        UIkit.notify({
+                            message : 'Contraseña incorrecta',
+                            status  : 'warning',
+                            timeout : 5000,
+                            pos:'top-center'
+                        });
+                        $('#password').val();
+                    }
+                else
+                    {
+                        UIkit.notify({
+                            message : 'Usuario no registrado',
+                            status  : 'danger',
+                            timeout : 5000,
+                            pos:'top-center'
+                        });
+                    }
+            },
+            error: function(data) {
+                alert(data);
+                console.log(data)
+            }
+        });
+        return false;
+    });
+
+    function pedir_documento(){
+        $("#cuerpo").load( "../static/html/pedir_documento.html");
+    }
+
+
+</script>

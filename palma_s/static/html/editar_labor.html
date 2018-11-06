@@ -1,0 +1,145 @@
+<div class="register-box">
+
+      <div class="register-box-body">
+        <p class="login-box-msg">Edición de Labor</p>
+
+        <form action="editar_labor" id="editar_labor" method="post">
+            <div id="tok">
+
+            </div>
+            <fieldset>
+
+
+            <div class="form-group has-feedback">
+                <input class="form-control" id="nombre" name="nombre" placeholder="Nombre de la labor" type="text" required title="Nombre de la labor"/>
+            </div>
+
+            <div class="form-group">
+                <div class="radio">
+                    <label>
+                        <input name="tipo" id="metro" value="0" checked="" type="radio">
+                        PFS x Metro Lineal
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input name="tipo" id="area" value="1"  type="radio">
+                            PFS x Area
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input name="tipo" id="siembra" value="2" type="radio">
+                            Siembra Palma
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input name="tipo" id="otros" value="3" type="radio">
+                        Otros CE
+                    </label>
+                </div>
+            </div>
+
+
+          <div class="row">
+            <div class="col-xs-8">
+
+            </div>
+            <div class="col-xs-4">
+              <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+          </div>
+
+                </fieldset>
+        </form>
+
+      </div>
+    </div>
+
+<script>
+    var frm;
+    jQuery(document).ready(function(){
+        etiqueta_id = '<input name="id" value="'+hacienda_editar+'" type="hidden">';
+        $('#tok').html(token+etiqueta_id);
+        frm = $('#editar_labor');
+        get_labor_editar();
+      });
+
+
+    function get_labor_editar(){
+        $.ajax({
+            type: 'GET',
+            url: 'get_labor_editar',
+            data: {'id' : hacienda_editar},
+            success: function (data) {
+                salida = data.split(',');
+                /**
+                 * salida [0] --> nombre
+                 * salida [1] --> tipo
+                 *
+                 */
+                $('#nombre').val(salida[0]);
+
+                if (salida[1] === '1'){
+                    $('#area').attr('checked', true);
+                }
+                else if (salida[1] === '2'){
+                    $('#siembra').attr('checked', true);
+                }
+                else if (salida[1] === '3'){
+                    $('#otros').attr('checked', true);
+                }
+
+            },
+            error: function(data) {
+                alert(data);
+                console.log(data)
+            }
+        });
+        return false;
+    }
+
+    frm.submit(function () {
+        $.ajax({
+            type: frm.attr('method'),
+            url: frm.attr('action'),
+            data: frm.serialize(),
+            success: function (data) {
+                if (data === 'ok')
+                    {
+                        UIkit.notify({
+                            message : 'Labor, Editado con Exito',
+                            status  : 'success',
+                            timeout : 3000,
+                            pos:'top-center'
+                        });
+                        get_labores();
+                    }
+                else if (data === 'ya'){
+                    UIkit.notify({
+                        message : 'Labor, ya ha sido Rregistrada con anterioridad' ,
+                        status  : 'danger',
+                        timeout : 3000,
+                        pos:'top-center'
+                    });
+                }
+                else
+                    {
+                        UIkit.notify({
+                            message : 'Upps! algo salio mal' ,
+                            status  : 'danger',
+                            timeout : 3000,
+                            pos:'top-center'
+                        });
+                    }
+            },
+            error: function(data) {
+                alert(data);
+                console.log(data)
+            }
+        });
+        return false;
+    });
+
+</script>

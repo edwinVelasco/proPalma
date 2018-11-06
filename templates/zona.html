@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Proyecto Palma</title>
+        <!-- icono de proyecto palma -->
+        <link rel="shortcut icon" href="{{STATIC_URL}}img/ico.png">
+        <!-- -->
+        <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
+        <!-- Bootstrap 3.3.2 -->
+        <link href="{{STATIC_URL}}css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <!-- FontAwesome 4.3.0 -->
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+        <!-- Ionicons 2.0.0 -->
+        <link href="http://code.ionicframework.com/ionicons/2.0.0/css/ionicons.min.css" rel="stylesheet" type="text/css" />
+        <!-- Theme style -->
+        <link href="{{STATIC_URL}}css/AdminLTE.min.css" rel="stylesheet" type="text/css" />
+
+        <link rel="stylesheet" href="{{STATIC_URL}}uikit/css/uikit.min.css" />
+        <link rel="stylesheet" href="{{STATIC_URL}}uikit/css/components/notify.min.css" />
+
+        <link href="{{STATIC_URL}}js/jquery-ui/jquery-ui.min.css" rel="stylesheet" type="text/css" />
+        <link href="{{STATIC_URL}}js/jquery-ui/jquery-ui.theme.min.css" rel="stylesheet" type="text/css" />
+
+        <!-- Mi style-->
+        <link href="{{STATIC_URL}}css/style.css" rel="stylesheet" type="text/css"/>
+        <!-- AdminLTE Skins. Choose a skin from the css/skins
+             folder instead of downloading all of them to reduce the load. -->
+        <link href="{{STATIC_URL}}css/skins/_all-skins.min.css" rel="stylesheet" type="text/css" />
+
+        <!-- Plugins -->
+        <!-- iCheck -->
+        <!--<link href="plugins/iCheck/flat/blue.css" rel="stylesheet" type="text/css" />
+        <!-- Morris chart -->
+        <!--<link href="plugins/morris/morris.css" rel="stylesheet" type="text/css" />
+        <!-- jvectormap -->
+        <!--<link href="plugins/jvectormap/jquery-jvectormap-1.2.2.css" rel="stylesheet" type="text/css" />
+        <!-- Date Picker -->
+        <!--<link href="plugins/datepicker/datepicker3.css" rel="stylesheet" type="text/css" />
+        <!-- Daterange picker -->
+        <!--<link href="plugins/daterangepicker/daterangepicker-bs3.css" rel="stylesheet" type="text/css" />
+        <!-- bootstrap wysihtml5 - text editor -->
+        <!--<link href="plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css" rel="stylesheet" type="text/css" />
+        <!-- End Plugins -->
+    </head>
+    <body class="skin-green">
+        <div class="wrapper">
+            <!-- Encabezado -->
+            <header class="main-header">
+                <!-- Logo -->
+                <a href="javascript:;" class="logo"><strong>Proyecto </strong> <span class="textn">Palma</span></a>
+                <!-- Header Navbar: style se encuentra en header.less -->
+                <nav class="navbar navbar-static-top" role="navigation">
+                    <!-- Sidebar toggle button-->
+                    <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+                        <span class="sr-only">Toggle navigation</span>
+                    </a>
+                    <div class="navbar-custom-menu">
+                        <ul class="nav navbar-nav">
+                            <!-- Messages: style can be found in dropdown.less-->
+                            <li class="dropdown messages-menu" onclick="logout()">
+                                <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
+                                    <strong>Cerrar Sesión</strong>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </div>
+                </nav>
+            </header>
+
+            <!-- contenido menu columna izq-->
+            <aside class="main-sidebar">
+                <!-- sidebar: style can be found in sidebar.less -->
+                <section class="sidebar">
+                    <!-- Panel usuario -->
+                    <div class="user-panel">
+                        <div class="pull-left image">
+                            <img src="{{STATIC_URL}}img/logo.png" class="img-circle" alt="User Image" />
+                        </div>
+                        <div class="pull-left info">
+                            <p>
+                                <a href="javascript:;" onclick="ver_datos_palmucultor()" title="Ver Datos Personales"><i class="fa fa-circle text-success"></i>..{{ nombre }}</a>
+                            </p>
+                            <p>
+                                <a href="javascript:;" onclick="desactivar_usuario_pal()" title="Desactivar la Cuenta"><i class="fa fa-circle-o"></i>Desactivar</a>
+                                <a href="javascript:;" onclick="editar_palmicultor()" title="Editar los Datos Personales"><i class="fa fa-circle-o "></i>Editar</a>
+                            </p>
+                        </div>
+                    </div>
+                    <!-- sidebar menu: : style can be found in sidebar.less -->
+                    <ul class="sidebar-menu">
+                        <li class="header">MENÚ PRINCIPAL</li>
+                        <li class="treeview" >
+                            <a href="/login">
+                                <i class="fa fa-dashboard"></i> <span>Home</span>
+                            </a>
+                        </li>
+
+                        <li class="treeview">
+                            <a href="#">
+                                <i class="fa fa-arrow-circle-down"></i> <span>Costos de Establecimiento</span> <i class="fa fa-angle-left pull-right"></i>
+                            </a>
+                            <ul class="treeview-menu">
+                                <li class="" onclick="get_correcciones_suelo()">
+                                    <a href="javascript:;"><i class="fa fa-circle"></i>Corrección de Suelos</a>
+                                </li>
+                                <li onclick="get_nivelacion_nutrientes()">
+                                    <a href="javascript:;"><i class="fa fa-circle"></i>Nivelación de Nutrientes</a>
+                                </li>
+                                <li onclick="get_preparaciones_fisicas()">
+                                    <a href="javascript:;"><i class="fa fa-circle"></i>Preparacion Fisica de Suelos</a>
+                                </li>
+                                <li onclick="get_siembra_cobertura()">
+                                    <a href="javascript:;"><i class="fa fa-circle"></i>Siembra de Cobertura</a>
+                                </li>
+                                <li onclick="get_siembra_palma()">
+                                    <a href="javascript:;"><i class="fa fa-circle"></i>Siembra de Palmas</a>
+                                </li>
+                                <li onclick="get_labores_siembra()">
+                                    <a href="javascript:;"><i class="fa fa-circle"></i>Labores de Siembra</a>
+                                </li>
+                                <li onclick="get_otros_ce()">
+                                    <a href="javascript:;"><i class="fa fa-circle"></i>Otros Costos de Establecimiento</a>
+                                </li>
+                                <li>
+                                    <a href="reporte_ce" target="_blank"><i class="fa fa-circle"></i>Reporte CE</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <!--
+                        <li class="treeview">
+                            <a href="javascript:;">
+                                <i class="fa fa-files-o"></i>
+                                <span>Nosotros</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:;">
+                                <i class="fa fa-th"></i> <span>Noticias</span>
+                            </a>
+                        </li>
+                        -->
+                    </ul>
+                </section>
+                <!-- /.sidebar -->
+            </aside>
+
+            <!-- Columna derecha. contiene navbar y la ruta de la pagina -->
+            <div class="content-wrapper" id="afterLogin">
+                <!-- Encabezado
+                <section class="content-header">
+                    <h1>
+                        Bienvenido
+                    </h1>
+
+                    <ol class="breadcrumb">
+                        <li><a href="#"><i class="fa fa-dashboard"></i> Inicio</a></li>
+                        <li class="active"></li>
+                    </ol>
+                </section>
+                -->
+
+                <!-- Contenido Principal de la pagina -->
+                <section class="content" id="cuerpo">
+                    <!-- Incluir aqui el contenido-->
+                </section><!-- /.contenido principal-->
+            </div><!-- /.content-wrapper -->
+
+            <!-- Pie de pagina -->
+            <footer class="main-footer">
+                <div class="pull-right hidden-xs">
+                    <b>Versión</b> 15.6.10
+                </div>
+                <strong>Copyright &copy; 2014-2015 <a href="#">ProPalma-UFPS</a>.</strong>
+            </footer>
+
+        </div><!-- wrapper-->
+
+
+        <!-- Funciones js -->
+
+        <!-- jQuery 2.1.3 -->
+        <script src="{{STATIC_URL}}js/plugins/jQuery/jQuery-2.1.3.min.js"></script>
+        <!-- jQuery UI 1.11.2 -->
+        <script src="{{STATIC_URL}}js/plugins/jQueryUI/jquery-ui.min.js" type="text/javascript"></script>
+        <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+        <script src="{{STATIC_URL}}js/plugins/iCheck/icheck.min.js" type="text/javascript"></script>
+        <script>
+            $.widget.bridge('uibutton', $.ui.button);
+        </script>
+        <!-- Bootstrap 3.3.2 JS -->
+        <script src="{{STATIC_URL}}js/bootstrap/bootstrap.min.js" type="text/javascript"></script>
+        <!-- AdminLTE App Oculta el menu-->
+        <script src="{{STATIC_URL}}js/app/app.min.js" type="text/javascript"></script>
+        <script src="{{STATIC_URL}}uikit/js/uikit.min.js"></script>
+        <script src="{{STATIC_URL}}uikit/js/components/notify.min.js"></script>
+        <script src="{{STATIC_URL}}js/jquery-ui/jquery-ui.js"></script>
+
+
+        <script src="{{STATIC_URL}}js-palma/corr_suelos.js"></script>
+        <script src="{{STATIC_URL}}js-palma/nivelacion_nutrientes.js"></script>
+        <script src="{{STATIC_URL}}js-palma/preparacion_fisica.js"></script>
+        <script src="{{STATIC_URL}}js-palma/siembra_cobertura.js"></script>
+        <script src="{{STATIC_URL}}js-palma/siembra_palma.js"></script>
+        <script src="{{STATIC_URL}}js-palma/otro_ce.js"></script>
+        <script src="{{STATIC_URL}}js-palma/labor_siembra.js"></script>
+
+    </body>
+
+</html>
+<script>
+    var hacienda_editar;
+    var token;
+    jQuery(document).ready(function() {
+        token = "{% csrf_token %}";
+      });
+
+
+    function logout(){
+        $.ajax({
+            type: "GET",
+            url: "logout",
+            data: "",
+            success: function (data) {
+                if (data === 'ok')
+                {
+                    window.location= "/";
+                }
+            },
+            error: function(data) {
+                console.log(data)
+            }
+        });
+        return false;
+    }
+
+    function editar_palmicultor(){
+        $("#cuerpo").load( "../static/html/editar_palmicultor.html");
+    }
+    function ver_datos_palmucultor(){
+        $("#cuerpo").load( "../static/html/ver_palmicultor.html");
+    }
+
+    function desactivar_usuario_pal(){
+
+        if(confirm('¿Seguro Quieres Desactivar la Cuenta?'))
+        {
+            $.ajax({
+                type: "GET",
+                url: "desactivar_palmicultor",
+                success: function (data) {
+                    if (data === 'ok')
+                    {
+                        logout();
+                    }
+                },
+                error: function(data) {
+                    console.log(data)
+                }
+            });
+            return false;
+	    }
+	    else
+	    {
+		    return false;
+	    }
+
+    }
+</script>

@@ -1,0 +1,123 @@
+<div class="register-box">
+
+      <div class="register-box-body">
+        <p class="login-box-msg">Edición de Insumos</p>
+
+        <form action="editar_insumo" id="editar_insumo" method="post">
+            <div id="tok">
+
+            </div>
+            <fieldset>
+
+
+            <div class="form-group has-feedback">
+                <input class="form-control" id="nombre" name="nombre" placeholder="Nombre del Insumo" type="text" required title="Nombre del Insumo"/>
+            </div>
+
+            <div class="form-group">
+
+                <div class="radio">
+                    <label>
+                        <input name="tipo" id="cobertura" value="0" checked="" type="radio">
+                        Coberturas
+                    </label>
+                </div>
+
+                <div class="radio">
+                    <label>
+                        <input name="tipo" id="variedad" value="1"  type="radio">
+                            Variedad de Palma
+                    </label>
+                </div>
+            </div>
+
+
+
+          <div class="row">
+            <div class="col-xs-8">
+
+            </div>
+            <div class="col-xs-4">
+              <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+          </div>
+
+                </fieldset>
+        </form>
+
+      </div>
+    </div>
+
+<script>
+    var frm;
+    jQuery(document).ready(function(){
+        etiqueta_id = '<input name="id" value="'+hacienda_editar+'" type="hidden">';
+        $('#tok').html(token+etiqueta_id);
+        frm = $('#editar_insumo');
+
+        $.ajax({
+            type: 'GET',
+            url: 'get_insumo_editar',
+            data: {'id' : hacienda_editar},
+            success: function (data) {
+                salida = data.split(',');
+                $('#nombre').val(salida[0]);
+                if(salida[1] == '1')
+                    $('#variedad').attr('checked', true);
+            },
+            error: function(data) {
+                alert(data);
+                console.log(data)
+            }
+        });
+      });
+
+
+    frm.submit(function () {
+        $.ajax({
+            type: frm.attr('method'),
+            url: frm.attr('action'),
+            data: frm.serialize(),
+            success: function (data) {
+                if (data === 'ok')
+                    {
+                        UIkit.notify({
+                            message : 'Insumo, Edición con Exito',
+                            status  : 'success',
+                            timeout : 3000,
+                            pos:'top-center'
+                        });
+                        get_insumos();
+                    }
+                else if (data === 'ya'){
+                    UIkit.notify({
+                        message : 'Insumo, ya ha sido Rregistrada con anterioridad' ,
+                        status  : 'danger',
+                        timeout : 3000,
+                        pos:'top-center'
+                    });
+                }
+                else
+                    {
+                        UIkit.notify({
+                            message : 'Upps! algo salio mal' ,
+                            status  : 'danger',
+                            timeout : 3000,
+                            pos:'top-center'
+                        });
+                    }
+            },
+            error: function(data) {
+                UIkit.notify({
+                    message : 'Upps! algo salio mal' ,
+                    status  : 'danger',
+                    timeout : 3000,
+                    pos:'top-center'
+                });
+                console.log(data)
+            }
+        });
+        return false;
+    });
+
+</script>

@@ -1,0 +1,86 @@
+<div class="register-box">
+
+      <div class="register-box-body">
+        <p class="login-box-msg">Recuperar Cuenta</p>
+
+        <form action="pedir_documento" id="pedir_documento" method="post">
+            <div id="tok">
+
+            </div>
+            <fieldset>
+
+
+            <div class="form-group has-feedback">
+                <input class="form-control" id="documento" name="documento" placeholder="Número de Documento" type="text" required title="Número de Documento"/>
+            </div>
+
+
+          <div class="row">
+            <div class="col-xs-8">
+
+            </div>
+            <div class="col-xs-4">
+              <button type="submit" class="btn btn-success">Guardar</button>
+            </div>
+          </div>
+
+                </fieldset>
+        </form>
+
+      </div>
+    </div>
+<script>
+    var frm;
+    var documento;
+    jQuery(document).ready(function(){
+        $('#tok').html(token);
+        frm = $('#pedir_documento');
+      });
+
+    frm.submit(function(){
+        documento = $('#documento').val();
+        $.ajax({
+            type: frm.attr('method'),
+            url: frm.attr('action'),
+            data: frm.serialize(),
+            success: function (data) {
+                if (data === 'ok')
+                    {
+                        UIkit.notify({
+                            message : 'su nueva contraseña se a enviado al correo electronico',
+                            status  : 'success',
+                            timeout : 5000,
+                            pos:'top-center'
+                        });
+                        $("#cuerpo").load( "../static/html/login.html");
+                        //$("#cuerpo").load( "../static/html/cambiar_pass.html");
+                    }
+                else if(data === 'inactivo')
+                    {
+                        UIkit.notify({
+                            message : 'El Usario esta inactivo',
+                            status  : 'danger',
+                            timeout : 5000,
+                            pos:'top-center'
+                        });
+                    }
+                else
+                    {
+                        UIkit.notify({
+                            message : 'Usuario no registrado',
+                            status  : 'danger',
+                            timeout : 5000,
+                            pos:'top-center'
+                        });
+                    }
+            },
+            error: function(data) {
+                alert(data);
+                console.log(data)
+            }
+        });
+        return false;
+    });
+
+
+</script>
